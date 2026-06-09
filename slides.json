@@ -3,24 +3,54 @@
     "category": "Bienvenue",
     "title": "Les Marmots Squash Club",
     "subtitle": "Liège — Saison 2025-2026",
-    "image": "images/slide1.jpg"
+    "image": "images2/1.jpg"
   },
   {
     "category": "Sponsors",
     "title": "Merci à nos partenaires",
     "subtitle": "Leur soutien fait vivre le club",
-    "image": "images/sponsors.jpg"
+    "image": "images2/2.jpg"
   },
   {
     "category": "Résultats",
     "title": "Belgian Doubles — Top 3 🏆",
     "subtitle": "Lucas Pascolo & Alexandre Hotte — Championnats Belgique",
-    "image": "images/resultats.jpg"
+    "image": "images2/3.jpg"
   },
   {
     "category": "Événement",
     "title": "Prochain tournoi",
     "subtitle": "Restez connectés sur nos réseaux",
-    "image": "images/evenement.jpg"
+    "image": "images2/4.jpg"
+  }
+    {
+    "category": "Événement",
+    "title": "Prochain tournoi",
+    "subtitle": "Restez connectés sur nos réseaux",
+    "image": "images2/5.jpg"
+  }
+    {
+    "category": "Événement",
+    "title": "Prochain tournoi",
+    "subtitle": "Restez connectés sur nos réseaux",
+    "image": "images2/6.jpg"
+  }
+    {
+    "category": "Événement",
+    "title": "Prochain tournoi",
+    "subtitle": "Restez connectés sur nos réseaux",
+    "image": "images2/7.jpg"
+  }
+    {
+    "category": "Événement",
+    "title": "Prochain tournoi",
+    "subtitle": "Restez connectés sur nos réseaux",
+    "image": "images2/8.jpg"
+  }
+    {
+    "category": "Événement",
+    "title": "Prochain tournoi",
+    "subtitle": "Restez connectés sur nos réseaux",
+    "image": "images2/9.jpg"
   }
 ]
