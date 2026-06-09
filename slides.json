@@ -1,0 +1,26 @@
+[
+  {
+    "category": "Bienvenue",
+    "title": "Les Marmots Squash Club",
+    "subtitle": "Liège — Saison 2025-2026",
+    "image": "images/slide1.jpg"
+  },
+  {
+    "category": "Sponsors",
+    "title": "Merci à nos partenaires",
+    "subtitle": "Leur soutien fait vivre le club",
+    "image": "images/sponsors.jpg"
+  },
+  {
+    "category": "Résultats",
+    "title": "Belgian Doubles — Top 3 🏆",
+    "subtitle": "Lucas Pascolo & Alexandre Hotte — Championnats Belgique",
+    "image": "images/resultats.jpg"
+  },
+  {
+    "category": "Événement",
+    "title": "Prochain tournoi",
+    "subtitle": "Restez connectés sur nos réseaux",
+    "image": "images/evenement.jpg"
+  }
+]
