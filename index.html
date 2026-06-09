@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Les Marmots Squash Club</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0a0a;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+  }
+
+  #slider {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    display: flex;
+    align-items: flex-end;
+  }
+
+  .slide.active { opacity: 1; }
+
+  .slide-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  .slide-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(0,0,0,0.82) 0%,
+      rgba(0,0,0,0.3) 45%,
+      rgba(0,0,0,0.05) 100%
+    );
+  }
+
+  .slide-content {
+    position: relative;
+    z-index: 2;
+    padding: 4vh 6vw;
+    width: 100%;
+  }
+
+  .slide-category {
+    display: inline-block;
+    background: #e8272b;
+    color: #fff;
+    font-size: 1.4vh;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 0.5vh 1.2vw;
+    border-radius: 3px;
+    margin-bottom: 1.5vh;
+  }
+
+  .slide-title {
+    font-size: 5.5vh;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    margin-bottom: 1.2vh;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+    max-width: 80%;
+  }
+
+  .slide-subtitle {
+    font-size: 2.2vh;
+    color: rgba(255,255,255,0.78);
+    font-weight: 400;
+    max-width: 65%;
+    line-height: 1.5;
+  }
+
+  /* Club logo top-right */
+  #club-logo {
+    position: fixed;
+    top: 3vh;
+    right: 3vw;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 0.8vw;
+  }
+
+  #club-logo .logo-text {
+    text-align: right;
+    line-height: 1.2;
+  }
+
+  #club-logo .logo-name {
+    color: #fff;
+    font-size: 1.8vh;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  #club-logo .logo-sub {
+    color: rgba(255,255,255,0.5);
+    font-size: 1.3vh;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* Progress dots */
+  #dots {
+    position: fixed;
+    bottom: 3vh;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    display: flex;
+    gap: 0.8vw;
+  }
+
+  .dot {
+    width: 0.6vw;
+    height: 0.6vw;
+    min-width: 6px;
+    min-height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    transition: background 0.4s, transform 0.4s;
+  }
+
+  .dot.active {
+    background: #e8272b;
+    transform: scale(1.4);
+  }
+
+  /* Progress bar */
+  #progress-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    background: #e8272b;
+    z-index: 100;
+    transition: width linear;
+  }
+
+  /* Placeholder when no image */
+  .slide-bg.placeholder {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  }
+
+  /* Error / loading state */
+  #loading {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.4);
+    font-size: 2vh;
+    z-index: 200;
+  }
+</style>
+</head>
+<body>
+
+<div id="loading">Chargement des slides...</div>
+
+<div id="club-logo">
+  <div class="logo-text">
+    <div class="logo-name">Les Marmots</div>
+    <div class="logo-sub">Squash Club · Liège</div>
+  </div>
+</div>
+
+<div id="slider"></div>
+<div id="dots"></div>
+<div id="progress-bar"></div>
+
+<script>
+const SLIDE_DURATION = 6000;
+const TRANSITION_DURATION = 1000;
+
+let slides = [];
+let current = 0;
+let timer = null;
+let progressTimer = null;
+let progressStart = null;
+
+async function loadSlides() {
+  try {
+    const res = await fetch('slides.json?t=' + Date.now());
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    slides = await res.json();
+    document.getElementById('loading').style.display = 'none';
+    initSlider();
+  } catch (e) {
+    document.getElementById('loading').textContent = 'Impossible de charger slides.json';
+    console.error(e);
+  }
+}
+
+function initSlider() {
+  if (!slides.length) return;
+
+  const sliderEl = document.getElementById('slider');
+  const dotsEl = document.getElementById('dots');
+
+  sliderEl.innerHTML = '';
+  dotsEl.innerHTML = '';
+
+  slides.forEach((slide, i) => {
+    const el = document.createElement('div');
+    el.className = 'slide' + (i === 0 ? ' active' : '');
+    el.innerHTML = `
+      <div class="slide-bg ${slide.image ? '' : 'placeholder'}" 
+           ${slide.image ? `style="background-image:url('${slide.image}')"` : ''}>
+      </div>
+      <div class="slide-overlay"></div>
+      <div class="slide-content">
+        ${slide.category ? `<div class="slide-category">${slide.category}</div>` : ''}
+        ${slide.title ? `<div class="slide-title">${slide.title}</div>` : ''}
+        ${slide.subtitle ? `<div class="slide-subtitle">${slide.subtitle}</div>` : ''}
+      </div>
+    `;
+    sliderEl.appendChild(el);
+
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (i === 0 ? ' active' : '');
+    dotsEl.appendChild(dot);
+  });
+
+  startAutoPlay();
+}
+
+function goTo(index) {
+  const allSlides = document.querySelectorAll('.slide');
+  const allDots = document.querySelectorAll('.dot');
+
+  allSlides[current].classList.remove('active');
+  allDots[current].classList.remove('active');
+
+  current = (index + slides.length) % slides.length;
+
+  allSlides[current].classList.add('active');
+  allDots[current].classList.add('active');
+}
+
+function startAutoPlay() {
+  if (timer) clearInterval(timer);
+  startProgress();
+  timer = setInterval(() => {
+    goTo(current + 1);
+    startProgress();
+  }, SLIDE_DURATION);
+}
+
+function startProgress() {
+  const bar = document.getElementById('progress-bar');
+  bar.style.transition = 'none';
+  bar.style.width = '0%';
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      bar.style.transition = `width ${SLIDE_DURATION}ms linear`;
+      bar.style.width = '100%';
+    });
+  });
+}
+
+loadSlides();
+
+// Auto-reload slides.json every 60s (pour mises à jour sans reload TV)
+setInterval(() => {
+  fetch('slides.json?t=' + Date.now())
+    .then(r => r.json())
+    .then(data => {
+      if (JSON.stringify(data) !== JSON.stringify(slides)) {
+        slides = data;
+        current = 0;
+        clearInterval(timer);
+        initSlider();
+      }
+    })
+    .catch(() => {});
+}, 60000);
+</script>
+</body>
+</html>
